@@ -22,3 +22,9 @@ reports/*.json
 # OS
 .DS_Store
 Thumbs.db
+
+
+# Phase 2 USB runtime data
+data/usb_baselines/*.json
+reports/usb/*.txt
+reports/usb/*.json

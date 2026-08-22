@@ -166,6 +166,7 @@ def compare_to_baseline(baseline: dict, progress_callback=None) -> dict:
         "scan_time": datetime.now().isoformat(timespec="seconds"),
         "summary": summary,
         "details": details,
+        "metadata": baseline["metadata"],
     }
 
 
@@ -194,6 +195,7 @@ def record_scan(baseline: dict, progress_callback=None):
         "scan_time": timestamp,
         "summary": summary,
         "details": details,
+        "metadata": baseline["metadata"],
     }
 
     baseline.setdefault("history", [])

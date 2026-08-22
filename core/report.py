@@ -86,18 +86,36 @@ def _append_preview_block(lines, item, label):
         lines.append(f"           (No preview available: {item['preview_note']})")
 
 
+def _device_info_block(lines, metadata):
+    """Append a USB device information block if this baseline is USB-backed."""
+    if not metadata.get("is_usb"):
+        return
+    lines.append("-" * 70)
+    lines.append("USB DEVICE INFORMATION")
+    lines.append("-" * 70)
+    lines.append(f"  Device Label : {metadata.get('device_label', 'Unknown')}")
+    lines.append(f"  Drive Type   : {metadata.get('device_type', 'Removable')}")
+    if metadata.get("device_total_gb") is not None:
+        lines.append(f"  Capacity     : {metadata['device_total_gb']} GB")
+    if metadata.get("device_free_gb") is not None:
+        lines.append(f"  Free Space   : {metadata['device_free_gb']} GB")
+    lines.append("")
+
+
 def generate_text_report(result: dict) -> str:
     s = result["summary"]
     details = result["details"]
+    metadata = result.get("metadata", {})
 
     lines = []
     lines.append("=" * 70)
-    lines.append("FILE INTEGRITY MONITORING REPORT")
+    lines.append("USB INTEGRITY REPORT" if metadata.get("is_usb") else "FILE INTEGRITY MONITORING REPORT")
     lines.append("=" * 70)
-    lines.append(f"Monitored Folder : {result['folder']}")
+    lines.append(f"Monitored {'Drive' if metadata.get('is_usb') else 'Folder'} : {result['folder']}")
     lines.append(f"Baseline Created  : {result['baseline_created_at']}")
     lines.append(f"Scan Time         : {result['scan_time']}")
     lines.append("")
+    _device_info_block(lines, metadata)
     lines.append(_plain_english_summary(s))
     lines.append("")
     lines.append("-" * 70)
@@ -214,12 +232,13 @@ def generate_timeline_report(baseline: dict) -> str:
 
     lines = []
     lines.append("=" * 70)
-    lines.append("FILE INTEGRITY — FULL TIMELINE REPORT")
+    lines.append("USB — FULL TIMELINE REPORT" if meta.get("is_usb") else "FILE INTEGRITY — FULL TIMELINE REPORT")
     lines.append("=" * 70)
-    lines.append(f"Monitored Folder : {meta['monitored_folder']}")
+    lines.append(f"Monitored {'Drive' if meta.get('is_usb') else 'Folder'} : {meta['monitored_folder']}")
     lines.append(f"Baseline Created  : {meta['created_at']}")
     lines.append(f"Total Events      : {len(history)}")
     lines.append("")
+    _device_info_block(lines, meta)
 
     if not history:
         lines.append("No history recorded yet. Run a scan to start building a timeline.")
